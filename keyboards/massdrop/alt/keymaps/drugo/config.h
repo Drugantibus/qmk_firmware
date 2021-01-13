@@ -8,3 +8,4 @@
 
 #define SERIAL_NUM          "FRT001"
 
+#define UNICODE_SELECTED_MODES UC_LNX

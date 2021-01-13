@@ -14,6 +14,7 @@ enum alt_keycodes {
     HID_SND,               //Send test HID
     MCR_SIG,               //Signature macro
     MCR_WTF,               //What the fuck did you say to me you little bitch?
+    UNI_ON,                //Startd UCIS (unicode input)
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -31,7 +32,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______,U_T_AUTO,U_T_AGCR, _______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_HOME, \
         _______,RGB_RMOD, RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, HID_SND, _______, _______, _______, _______, _______,          _______, KC_BRIU, \
         _______, RGB_TOG, RGB_FRZ, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, DBG_KBD,DBG_MTRX, _______, _______,          KC_VOLU, KC_BRID, \
-        _______, _______, _______,                            KC_MPLY,                            MO(2)  , _______, KC_MPRV, KC_VOLD, KC_MNXT  \
+        UNI_ON , _______, _______,                            KC_MPLY,                            MO(2)  , _______, KC_MPRV, KC_VOLD, KC_MNXT  \
     ),
     // MACRO
     [2] = LAYOUT_65_ansi_blocker(
@@ -94,6 +95,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+        case UNI_ON:
+            if (record->event.pressed) {
+                qk_ucis_start();
+            }
+            return false;        
         case MCR_SIG:
             if (record->event.pressed) {
                 SEND_STRING("Best,\nAlessandro Fort");
@@ -276,4 +282,13 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
         break;
     }
 }
+#endif
+
+#ifdef UCIS_ENABLE
+    const qk_ucis_symbol_t ucis_symbol_table[] = UCIS_TABLE(
+    UCIS_SYM("poop", 0x1F4A9),                // 💩
+    UCIS_SYM("rofl", 0x1F923),                // 🤣
+    UCIS_SYM("cuba", 0x1F1E8, 0x1F1FA),       // 🇨🇺
+    UCIS_SYM("look", 0x0CA0, 0x005F, 0x0CA0), // ಠ_ಠ
+);
 #endif
