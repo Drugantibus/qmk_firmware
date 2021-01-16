@@ -13,7 +13,9 @@ enum alt_keycodes {
     RGB_FRZ,               //Freezes current RGB effect
     HID_SND,               //Send test HID
     MCR_SIG,               //Signature macro
-    MCR_WTF,               //What the fuck did you say to me you little bitch?
+    MCR_APPR,              //Approval macro
+    MCR_PSW,               //Password macro
+    MCR_UCIS,              //Print configured UCIS entries
     UNI_ON,                //Startd UCIS (unicode input)
 };
 
@@ -37,9 +39,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // MACRO
     [2] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, MCR_SIG, _______, _______, MCR_WTF, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______,MCR_UCIS, _______, _______, MCR_PSW, _______, _______, _______, _______, \
+        _______,MCR_APPR, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, MCR_SIG, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         DM_REC1, DM_RSTP, DM_PLY1,                            _______,                            _______, _______, _______, _______, _______  \
     ),
     
@@ -102,12 +104,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;        
         case MCR_SIG:
             if (record->event.pressed) {
-                SEND_STRING("Best,\nAlessandro Fort");
+                SEND_STRING("\n\nBest,\nAlessandro Fort");
             }
             return false;
-        case MCR_WTF:
+        case MCR_APPR:
             if (record->event.pressed) {
-                SEND_STRING("What the fuck did you just fucking say about me, you little bitch? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and I'm the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and that's just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little \"clever\" comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.");
+                SEND_STRING("\n\nI've sent your request for approval, I'll let you know as soon as I'm able to proceed.");
+            }
+            return false;
+        case MCR_PSW:
+            if (record->event.pressed) {
+                SEND_STRING("\n\nPassword was reset as requested. Please let us know in case of any issues.");
+            }
+            return false;
+        case MCR_UCIS:
+            if (record->event.pressed) {
+                SEND_STRING("bang sarc f look lenny sus shrug yay tflip tback lost cool");
             }
             return false;
         case MO(2):
@@ -115,11 +127,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_previous_state = rgb_matrix_get_flags();
                 rgb_matrix_set_flags(LED_FLAG_NONE);
                 rgb_matrix_set_color_all(0, 0, 0);
-                rgb_matrix_set_color(46, 0, 255, 0); // X
-                rgb_matrix_set_color(49, 255, 0, 0); // B
-                rgb_matrix_set_color(58, 255, 50, 0); // LCTRL
-                rgb_matrix_set_color(59, 255, 50, 0); // LGUI
-                rgb_matrix_set_color(60, 255, 50, 0); // LALT
+                rgb_matrix_set_color(31, 255, 50, 0); // A
+                rgb_matrix_set_color(25, 255, 50, 0); // P
+                rgb_matrix_set_color(22, 100, 0, 200);// U
+                rgb_matrix_set_color(46, 255, 50, 0); // X
+                rgb_matrix_set_color(58, 100, 0, 200);// LCTRL
+                rgb_matrix_set_color(59, 100, 0, 200);// LGUI
+                rgb_matrix_set_color(60, 100, 0, 200);// LALT
                 for (int i = 67; i < 105; i++){
                     rgb_matrix_set_color(i, 0, 200, 50); // Underglow
                 }
@@ -185,6 +199,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         // Not working
         // case KC_LALT:
         //     if (record->event.pressed) {
+        //         rgb_matrix_set_flags(LED_FLAG_NONE);
         //         for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         //             for (uint8_t j = 0; j < MATRIX_COLS; j++){
         //                 // RGB_MATRIX_TEST_LED_FLAGS();
@@ -286,11 +301,17 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 
 #ifdef UCIS_ENABLE
     const qk_ucis_symbol_t ucis_symbol_table[] = UCIS_TABLE(
-    UCIS_SYM("poop", 0x1F4A9),                // 💩
-    UCIS_SYM("rofl", 0x1F923),                // 🤣
     UCIS_SYM("bang", 0x203D),                 // ‽
     UCIS_SYM("sarc", 0x2E2E),                 // ⸮
     UCIS_SYM("f",    0x2131),                 // ℱ
-    UCIS_SYM("look", 0x0CA0, 0x005F, 0x0CA0)  // ಠ_ಠ
+    UCIS_SYM("look", 0x0CA0, 0x005F, 0x0CA0),  // ಠ_ಠ
+    UCIS_SYM("lenny",0x0028, 0x0020, 0x0361, 0x00B0, 0x0020, 0x035C, 0x0296, 0x0020, 0x0361, 0x00B0, 0x0029),  // ( ͡° ͜ʖ ͡°)
+    UCIS_SYM("sus",  0x0028, 0x0020, 0x0360, 0x00b0, 0x0020, 0x035f, 0x0296, 0x0020, 0x0361, 0x00b0, 0x0029), // ( ͠° ͟ʖ ͡°)
+    UCIS_SYM("shrug",0x00AF, 0x005C, 0x005F, 0x0028, 0x30C4, 0x0029, 0x005F, 0x002F, 0x00AF), // ¯\_(ツ)_/¯
+    UCIS_SYM("yay",  0x1555, 0x0028, 0x0020, 0x141B, 0x0020, 0x0029, 0x1557), // ᕕ( ᐛ )ᕗ
+    UCIS_SYM("tflip",0x0028, 0x256f, 0x00b0, 0x25a1, 0x00b0, 0xff09, 0x256f, 0xfe35, 0x0020, 0x253b, 0x2501, 0x253b), // (╯°□°）╯︵ ┻━┻
+    UCIS_SYM("tback",0x252c, 0x2500, 0x252c, 0x30ce, 0x0028, 0x0020, 0x00ba, 0x0020, 0x005f, 0x0020, 0x00ba, 0x30ce, 0x0029), // ┬─┬ノ( º _ ºノ)
+    UCIS_SYM("lost", 0x0028, 0x0020, 0xff61, 0x005f, 0xff61, 0x0029), // ( ｡_｡)
+    UCIS_SYM("cool", 0x0028, 0x2310, 0x25a0, 0x005f, 0x25a0, 0x0029) // (⌐■_■)
 );
 #endif
