@@ -27,8 +27,8 @@
 #define USB_LED_INDICATOR_ENABLE    //Comment out to disable indicator functionality
 #ifdef USB_LED_INDICATOR_ENABLE     //Scan codes refer to actual key matrix codes, not KC_* (255 to disable)
     #define USB_LED_NUM_LOCK_SCANCODE       255
-    #define USB_LED_CAPS_LOCK_SCANCODE      30
-    #define USB_LED_SCROLL_LOCK_SCANCODE    43
-    #define USB_LED_COMPOSE_SCANCODE        58
+    #define USB_LED_CAPS_LOCK_SCANCODE      30  //CAPS
+    #define USB_LED_SCROLL_LOCK_SCANCODE    0   //ESC (for linux keymap indicator)
+    #define USB_LED_COMPOSE_SCANCODE        58  //LCTRL
     #define USB_LED_KANA_SCANCODE           255
 #endif //USB_LED_INDICATOR_ENABLE

@@ -12,9 +12,11 @@ enum alt_keycodes {
     MD_BOOT,               //Restart into bootloader after hold timeout
     RGB_FRZ,               //Freezes current RGB effect
     HID_SND,               //Send test HID
-    MCR_SIG,               //Signature macro
+    MCR_BST,               //Signature macro (Best)
+    MCR_THX,               //Signature macro (Thanks)
     MCR_APPR,              //Approval macro
     MCR_PSW,               //Password macro
+    MCR_ISS,               //Issues macro
     MCR_UCIS,              //Print configured UCIS entries
     UNI_ON,                //Startd UCIS (unicode input)
 };
@@ -39,9 +41,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // MACRO
     [2] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______,MCR_UCIS, _______, _______, MCR_PSW, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, MCR_THX, _______,MCR_UCIS, MCR_ISS, _______, MCR_PSW, _______, _______, _______, _______, \
         _______,MCR_APPR, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, MCR_SIG, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, MCR_BST, _______, _______, _______, _______, _______, _______,          _______, _______, \
         DM_REC1, DM_RSTP, DM_PLY1,                            _______,                            _______, _______, _______, _______, _______  \
     ),
     
@@ -102,19 +104,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 qk_ucis_start();
             }
             return false;        
-        case MCR_SIG:
+        case MCR_BST:
             if (record->event.pressed) {
                 SEND_STRING("\n\nBest,\nAlessandro Fort");
             }
             return false;
+        case MCR_THX:
+            if (record->event.pressed) {
+                SEND_STRING("\n\nThanks,\nAlessandro Fort");
+            }
+            return false;
         case MCR_APPR:
             if (record->event.pressed) {
-                SEND_STRING("\n\nI've sent your request for approval, I'll let you know as soon as I'm able to proceed.");
+                SEND_STRING("\n\nI've sent your request for approval, I'll let you know as soon as I'm able to proceed.\n@ , please see this request for ");
             }
             return false;
         case MCR_PSW:
             if (record->event.pressed) {
                 SEND_STRING("\n\nPassword was reset as requested. Please let us know in case of any issues.");
+            }
+            return false;
+        case MCR_ISS:
+            if (record->event.pressed) {
+                SEND_STRING("Please let us know in case there are any issues.");
             }
             return false;
         case MCR_UCIS:
@@ -127,10 +139,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_previous_state = rgb_matrix_get_flags();
                 rgb_matrix_set_flags(LED_FLAG_NONE);
                 rgb_matrix_set_color_all(0, 0, 0);
-                rgb_matrix_set_color(31, 255, 50, 0); // A
-                rgb_matrix_set_color(25, 255, 50, 0); // P
+                rgb_matrix_set_color(20, 255, 50, 0); // T
                 rgb_matrix_set_color(22, 100, 0, 200);// U
-                rgb_matrix_set_color(46, 255, 50, 0); // X
+                rgb_matrix_set_color(25, 255, 50, 0); // P
+                rgb_matrix_set_color(23, 255, 50, 0); // I
+                rgb_matrix_set_color(31, 255, 50, 0); // A
+                rgb_matrix_set_color(49, 255, 50, 0); // B
                 rgb_matrix_set_color(58, 100, 0, 200);// LCTRL
                 rgb_matrix_set_color(59, 100, 0, 200);// LGUI
                 rgb_matrix_set_color(60, 100, 0, 200);// LALT

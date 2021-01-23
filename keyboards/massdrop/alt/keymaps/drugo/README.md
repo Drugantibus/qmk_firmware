@@ -6,6 +6,7 @@ My keymap.
 Pretty standard, except for:
 - [*] Swapped HOME with END
 - [+] CTRL tap-mod on CAPS LOCK
+- [+] Added Scroll Lock indicator LED on ESC for KDE keyboard layout indication
 
 ## Fn layer
 - [*] Moved media controls to arrow keys (prev/next on LEFT/RIGHT, vol+/vol- on UP/DOWN, play/pause on SPACE)
