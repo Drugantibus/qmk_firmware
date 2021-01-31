@@ -160,10 +160,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         //     if (record->event.pressed) {
         //         uint8_t data[RAW_EPSIZE];
         //         data[0] = 1;
-        //         data[1] = 'F';
-        //         data[2] = 'o';
-        //         data[3] = 'r';
-        //         data[4] = 't';
+        //         data[1] = 'Q';
+        //         data[2] = 'M';
+        //         data[3] = 'K';
+        //         data[4] = '!';
         //         for (int i = 5; i < RAW_EPSIZE; i++){
         //             data[i] = 0;
         //         }
@@ -210,22 +210,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
-        // Not working
-        // case KC_LALT:
-        //     if (record->event.pressed) {
-        //         rgb_matrix_set_flags(LED_FLAG_NONE);
-        //         for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        //             for (uint8_t j = 0; j < MATRIX_COLS; j++){
-        //                 // RGB_MATRIX_TEST_LED_FLAGS();
-        //                 if (keymaps[1][i][j] != KC_TRNS) {
-        //                     rgb_matrix_set_color(i+j, 0, 255, 0);
-        //                 } else {
-        //                     rgb_matrix_set_color(i+j, 255, 50, 0);
-        //                 }
-        //             }
-        //         }
-        //         return true;
-        //     }
         default:
             return true; //Process all other keycodes normally
     }
@@ -254,6 +238,10 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     rgb_matrix_disable_noeeprom();
                 }
                 break;
+                case 5: {
+                    rgb_matrix_set_flags(LED_FLAG_ALL);
+                    rgb_matrix_step();
+                }
                 default: {
                     rgb_matrix_set_flags(LED_FLAG_ALL);
                     rgb_matrix_enable_noeeprom();
@@ -267,7 +255,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
         case 2:
             
             switch (data[1]) {
-                // Solid bottom underglow
+                // Bottom underglow
                 case 1: {
                     uint8_t r = data[2];
                     uint8_t g = data[3];
@@ -296,6 +284,27 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     rgb_matrix_set_flags(LED_FLAG_NONE);
                     rgb_matrix_set_color_all(r, g, b);
                 }
+                // Full underglow
+                case 3: {
+                    uint8_t r = data[2];
+                    uint8_t g = data[3];
+                    uint8_t b = data[4];
+                    switch(rgb_matrix_get_flags()){
+                        case LED_FLAG_ALL:
+                            rgb_matrix_set_flags(LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR);
+                        break;
+                        case LED_FLAG_UNDERGLOW:
+                            rgb_matrix_set_flags(LED_FLAG_NONE);
+                        break;
+                        case LED_FLAG_NONE:
+                            rgb_matrix_enable_noeeprom();
+                        break;
+                    }
+                    for (int i = 67; i <= 105; i++) {
+                        rgb_matrix_set_color(i, r, g, b);
+                    }
+                }
+                break;
             }
         break;
         // Get RGB state

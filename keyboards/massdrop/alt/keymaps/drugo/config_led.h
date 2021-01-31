@@ -29,6 +29,6 @@
     #define USB_LED_NUM_LOCK_SCANCODE       255
     #define USB_LED_CAPS_LOCK_SCANCODE      30  //CAPS
     #define USB_LED_SCROLL_LOCK_SCANCODE    0   //ESC (for linux keymap indicator)
-    #define USB_LED_COMPOSE_SCANCODE        58  //LCTRL
+    #define USB_LED_COMPOSE_SCANCODE        58  //LCTRL (unused)
     #define USB_LED_KANA_SCANCODE           255
 #endif //USB_LED_INDICATOR_ENABLE

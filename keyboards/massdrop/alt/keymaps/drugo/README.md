@@ -6,7 +6,7 @@ My keymap.
 Pretty standard, except for:
 - [*] Swapped HOME with END
 - [+] CTRL tap-mod on CAPS LOCK
-- [+] Added Scroll Lock indicator LED on ESC for KDE keyboard layout indication
+- [+] Added Scroll Lock indicator LED on ESC for KDE keyboard layout indication (enable in Input Devices → Keyboard → Advanced → Use keyboad LED to show alternative layout)
 
 ## Fn layer
 - [*] Moved media controls to arrow keys (prev/next on LEFT/RIGHT, vol+/vol- on UP/DOWN, play/pause on SPACE)
@@ -29,12 +29,17 @@ Possible message format:
         0x02: Keylight only
         0x03: Underglow only
         0x04: All LEDs off
+        0x05: Go to next RGB animation
     0x02: Notifications
         0x01: Set the "bottom" (user-facing) part of the underglow to a specific color
             0xXX: Red value
             0xXX: Green value
             0xXX: Blue value
         0x02: Set the whole keyboard to a color
+            0xXX: Red value
+            0xXX: Green value
+            0xXX: Blue value
+        0x03: Set the whole underglow to a color
             0xXX: Red value
             0xXX: Green value
             0xXX: Blue value
