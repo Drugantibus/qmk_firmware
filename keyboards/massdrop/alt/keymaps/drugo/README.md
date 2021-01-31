@@ -21,7 +21,7 @@ Pretty standard, except for:
 - [+] RGB only shows configured keys (set manually for now)
 
 ## Other features
-Notifications using RGB and HID. Host script not published yet.
+Notifications using RGB and HID. Host script available [here](https://github.com/Drugantibus/qmk-hid-rgb).
 ```
 Possible message format:
     0x01: Sets the LED state
