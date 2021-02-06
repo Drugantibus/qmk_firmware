@@ -215,77 +215,79 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+void set_led_range(int start, int stop, uint8_t r, uint8_t g, uint8_t b){
+    for(int i = start; i <= stop; i++){
+        rgb_matrix_set_color(i, r, g, b);
+    }
+}
+
 #ifdef RAW_ENABLE
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     switch(data[0]){
         // Set RGB state
         case 1:
             switch (data[1]) {
-                case 2: {
+                case 2: 
                     rgb_matrix_enable_noeeprom();
                     rgb_matrix_set_flags(LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR);
                     rgb_matrix_set_color_all(0, 0, 0);
-                }
-                break;
-                case 3: {
+                    break;
+                case 3: 
                     rgb_matrix_enable_noeeprom();
                     rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
                     rgb_matrix_set_color_all(0, 0, 0);
-                }
-                break;
-                case 4: {
+                    break;
+                case 4: 
                     rgb_matrix_set_flags(LED_FLAG_NONE);
                     rgb_matrix_disable_noeeprom();
-                }
-                break;
-                case 5: {
+                    break;
+                case 5: 
                     rgb_matrix_set_flags(LED_FLAG_ALL);
                     rgb_matrix_step();
-                }
-                default: {
+                    break;
+                default: 
                     rgb_matrix_set_flags(LED_FLAG_ALL);
                     rgb_matrix_enable_noeeprom();
-                }
-                break;
+                    break;
             }
-        break;
+            break;
         // Notifications
         // Note: caller is expected to reset RGB to previous state
         // TODO: set flags on single LEDs so RGB animation isn't interrupted on underglow
         case 2:
-            
             switch (data[1]) {
                 // Bottom underglow
-                case 1: {
+                case 1:{
                     uint8_t r = data[2];
                     uint8_t g = data[3];
                     uint8_t b = data[4];
                     switch(rgb_matrix_get_flags()){
                         case LED_FLAG_ALL:
                             rgb_matrix_set_flags(LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR);
-                        break;
+                            break;
                         case LED_FLAG_UNDERGLOW:
                             rgb_matrix_set_flags(LED_FLAG_NONE);
-                        break;
+                            break;
                         case LED_FLAG_NONE:
                             rgb_matrix_enable_noeeprom();
-                        break;
+                            break;
                     }
                     for (int i = 67; i <= 81; i++) {
                         rgb_matrix_set_color(i, r, g, b);
                     }
+                    break;
                 }
-                break;
                 // Full color change
-                case 2: {
+                case 2:{
                     uint8_t r = data[2];
                     uint8_t g = data[3];
                     uint8_t b = data[4];
                     rgb_matrix_set_flags(LED_FLAG_NONE);
                     rgb_matrix_set_color_all(r, g, b);
+                    break;
                 }
                 // Full underglow
-                case 3: {
+                case 3:{ 
                     uint8_t r = data[2];
                     uint8_t g = data[3];
                     uint8_t b = data[4];
@@ -303,10 +305,10 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     for (int i = 67; i <= 105; i++) {
                         rgb_matrix_set_color(i, r, g, b);
                     }
+                    break;
                 }
-                break;
             }
-        break;
+            break;
         // Get RGB state
         case 3:
             switch(rgb_matrix_get_flags()){
@@ -317,7 +319,54 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                 default: data[0] = 0; break;
             }
             raw_hid_send(data, RAW_EPSIZE);
-        break;
+            break;
+        // Single LED control
+        case 4:{
+            // TODO: set only the specific LED(s) flag
+            rgb_matrix_set_flags(LED_FLAG_NONE);
+            uint8_t index = data[2];
+            uint8_t r = data[3];
+            uint8_t g = data[4];
+            uint8_t b = data[5];
+            switch(data[1]){
+                // Set one led to color
+                case 1:
+                    rgb_matrix_set_color(index, r, g, b);
+                    break;
+                // Set one row to color
+                case 2:
+                    switch(index){
+                        case 1: // First row
+                            set_led_range(0, 14, r, g, b);
+                            break;
+                        case 2: // Second row
+                            set_led_range(15, 29, r, g, b);
+                            break;
+                        case 3: // Third row
+                            set_led_range(30, 43, r, g, b);
+                            break;
+                        case 4: //Fourth row
+                            set_led_range(44, 57, r, g, b);
+                            break;
+                        case 5: // Fifth row
+                            set_led_range(58, 66, r, g, b);
+                            break;
+                        case 6: // Bottom underglow
+                            set_led_range(67, 81, r, g, b);
+                            break;
+                        case 7: // Right underglow
+                            set_led_range(82, 86, r, g, b);
+                            break;
+                        case 8: // Top underglow
+                            set_led_range(87, 99, r, g, b);
+                            break;
+                        case 9: // Left underglow
+                            set_led_range(100, 104, r, g, b);
+                            break;
+                    }
+                break;
+            }
+        }
     }
 }
 #endif

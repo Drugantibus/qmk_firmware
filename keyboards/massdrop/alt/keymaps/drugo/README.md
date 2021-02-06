@@ -35,15 +35,27 @@ Possible message format:
             0xXX: Red value
             0xXX: Green value
             0xXX: Blue value
+            (hereafter (colors))
         0x02: Set the whole keyboard to a color
-            0xXX: Red value
-            0xXX: Green value
-            0xXX: Blue value
+            (colors)
         0x03: Set the whole underglow to a color
-            0xXX: Red value
-            0xXX: Green value
-            0xXX: Blue value
+            (colors)
     0x03: Get the current LED state
         No parameters, returns (sends) a value as in the 0x01 section
+    0x04: Control single or group of LEDs
+        0x01: Change a single LED's color
+            0xXX: LED number
+            (colors)
+        0x02: Change a group of LEDs
+            0x01-0x05: nth row
+                (colors)
+            0x06: Bottom underglow
+                (colors)
+            0x07: Right underglow
+                (colors)
+            0x08: Top underglow
+                (colors)
+            0x09: Left underglow
+                (colors)
 ```
 Note that the caller is expected to reset the previous state after sending a notification command. 
