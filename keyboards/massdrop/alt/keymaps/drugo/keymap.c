@@ -11,12 +11,13 @@ enum alt_keycodes {
     DBG_MOU,               //DEBUG Toggle Mouse Prints
     MD_BOOT,               //Restart into bootloader after hold timeout
     RGB_FRZ,               //Freezes current RGB effect
-    HID_SND,               //Send test HID
+//    HID_SND,               //Send test HID
     MCR_BST,               //Signature macro (Best)
     MCR_THX,               //Signature macro (Thanks)
     MCR_APPR,              //Approval macro
     MCR_PSW,               //Password macro
     MCR_ISS,               //Issues macro
+    MCR_TVW,               //Teamviewer macro
     MCR_UCIS,              //Print configured UCIS entries
     UNI_ON,                //Startd UCIS (unicode input)
 };
@@ -25,7 +26,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // DEFAULT
     [0] = LAYOUT_65_ansi_blocker(
         KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
-        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_END, \
+        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_END,  \
  CTL_T(KC_CAPS), KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,          KC_UP,   KC_PGDN, \
         KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                             KC_RALT, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
@@ -34,19 +35,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
         _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______,U_T_AUTO,U_T_AGCR, _______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_HOME, \
-        _______,RGB_RMOD, RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, HID_SND, _______, _______, _______, _______, _______,          _______, KC_BRIU, \
+        _______,RGB_RMOD, RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, KC_BRIU, \
         _______, RGB_TOG, RGB_FRZ, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, DBG_KBD,DBG_MTRX, _______, _______,          KC_VOLU, KC_BRID, \
-        UNI_ON , UC_M_WC, UC_M_LN ,                            KC_MPLY,                            MO(2)  , _______, KC_MPRV, KC_VOLD, KC_MNXT  \
+        UNI_ON , UC_M_WC, UC_M_LN,                            KC_MPLY,                            MO(2)  , _______, KC_MPRV, KC_VOLD, KC_MNXT  \
     ),
     // MACRO
     [2] = LAYOUT_65_ansi_blocker(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        TG(3)  , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, MCR_THX, _______,MCR_UCIS, MCR_ISS, _______, MCR_PSW, _______, _______, _______, _______, \
-        _______,MCR_APPR, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______,MCR_APPR, _______, _______, _______, _______, MCR_TVW, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, MCR_BST, _______, _______, _______, _______, _______, _______,          _______, _______, \
         DM_REC1, DM_RSTP, DM_PLY1,                            _______,                            _______, _______, _______, _______, _______  \
     ),
-    
+    // MACOS
+    [3] = LAYOUT_65_ansi_blocker(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+ CMD_T(KC_CAPS), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
+    )
 };
 
 
@@ -116,7 +124,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case MCR_APPR:
             if (record->event.pressed) {
-                SEND_STRING("\n\nI've sent your request for approval, I'll let you know as soon as I'm able to proceed.\n@ , please see this request for ");
+                SEND_STRING("\n\nI've sent your request for approval, I'll let you know as soon as I'm able to proceed.\n@, please see this request for ");
             }
             return false;
         case MCR_PSW:
@@ -129,6 +137,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 SEND_STRING("Please let us know in case there are any issues.");
             }
             return false;
+        case MCR_TVW:
+            if (record->event.pressed) {
+                SEND_STRING(", how are you? :)"SS_LSFT("\n")"I can help you reset your password by connecting via Teamviewer, please send me your credentials when you have a couple of minutes so I can connect and help out :) ");
+            }
+            return false;
         case MCR_UCIS:
             if (record->event.pressed) {
                 SEND_STRING("bang sarc f look lenny sus shrug yay tflip tback lost cool");
@@ -139,11 +152,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_previous_state = rgb_matrix_get_flags();
                 rgb_matrix_set_flags(LED_FLAG_NONE);
                 rgb_matrix_set_color_all(0, 0, 0);
+                rgb_matrix_set_color(0,  0,  255, 0); // ESC
                 rgb_matrix_set_color(20, 255, 50, 0); // T
                 rgb_matrix_set_color(22, 100, 0, 200);// U
                 rgb_matrix_set_color(25, 255, 50, 0); // P
                 rgb_matrix_set_color(23, 255, 50, 0); // I
                 rgb_matrix_set_color(31, 255, 50, 0); // A
+                rgb_matrix_set_color(36, 255, 50, 0); // H
                 rgb_matrix_set_color(49, 255, 50, 0); // B
                 rgb_matrix_set_color(58, 100, 0, 200);// LCTRL
                 rgb_matrix_set_color(59, 100, 0, 200);// LGUI
@@ -218,6 +233,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 void set_led_range(int start, int stop, uint8_t r, uint8_t g, uint8_t b){
     for(int i = start; i <= stop; i++){
         rgb_matrix_set_color(i, r, g, b);
+    }
+}
+
+void rgb_matrix_indicators_user(void) {
+    if( layer_state_is(3) ){
+        rgb_matrix_set_color(0, 100, 0, 200);
+        // set_led_range(71, 75, 100, 0, 200);
     }
 }
 
