@@ -7,6 +7,9 @@ Pretty standard, except for:
 - [*] Swapped HOME with END
 - [+] CTRL tap-mod on CAPS LOCK
 - [+] Added Scroll Lock indicator LED on ESC for KDE keyboard layout indication (enable in Input Devices → Keyboard → Advanced → Use keyboad LED to show alternative layout)
+- [+] Added Space Cadet Shift 
+- [+] Added Tap Dance on ESC: ESC on single tap, GUI+L on double tap
+
 
 ## Fn layer
 - [*] Moved media controls to arrow keys (prev/next on LEFT/RIGHT, vol+/vol- on UP/DOWN, play/pause on SPACE)
@@ -19,6 +22,7 @@ Pretty standard, except for:
 - [+] Added dynamic macro record/stop/play on LCTRL/LGUI/LALT
 - [+] Added various work-related macros
 - [+] RGB only shows configured keys (set manually for now)
+- [+] Added macOS mode toggle on ESC (Changes CAPS tap-mod to GUI)
 
 ## Other features
 Notifications using RGB and HID. Host script available [here](https://github.com/Drugantibus/qmk-hid-rgb).
