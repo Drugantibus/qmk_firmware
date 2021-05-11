@@ -8,3 +8,5 @@
 
 #define SERIAL_NUM          "FRT001"
 
+#define UNICODE_SELECTED_MODES UC_LNX, UC_WINC
+#define UCIS_MAX_CODE_POINTS 32
