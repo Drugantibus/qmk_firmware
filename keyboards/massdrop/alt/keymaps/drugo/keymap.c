@@ -25,6 +25,22 @@ enum {
     TD_LOCK,           //ESC/GUI+L
 };
 
+enum alt_rgb_mode {
+    RGB_MODE_ALL,
+    RGB_MODE_KEYLIGHT,
+    RGB_MODE_UNDERGLOW,
+    RGB_MODE_NONE,
+};
+
+typedef union {
+    uint32_t raw;
+    struct {
+        uint8_t rgb_mode :8;
+    };
+} alt_config_t;
+
+alt_config_t alt_config;
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // DEFAULT
     [0] = LAYOUT_65_ansi_blocker(
@@ -39,7 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
         _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______,U_T_AUTO,U_T_AGCR, _______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_HOME, \
         _______,RGB_RMOD, RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, KC_BRIU, \
-        _______, RGB_TOG, RGB_FRZ, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, DBG_KBD,DBG_MTRX, _______, _______,          KC_VOLU, KC_BRID, \
+        UC_M_MA, RGB_TOG, RGB_FRZ, _______, EEP_RST, MD_BOOT, NK_TOGG, DBG_TOG, DBG_KBD,DBG_MTRX, _______, _______,          KC_VOLU, KC_BRID, \
         UNI_ON , UC_M_WC, UC_M_LN,                            KC_MPLY,                            MO(2)  , _______, KC_MPRV, KC_VOLD, KC_MNXT  \
     ),
     // MACRO
@@ -107,6 +123,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 if (timer_elapsed32(key_timer) >= 500) {
                     reset_keyboard();
+                }
+            }
+            return false;
+        case EEP_RST:
+            if (record->event.pressed) {
+                key_timer = timer_read32();
+            } else {
+                if (timer_elapsed32(key_timer) >= 500) {
+                    eeconfig_init();
                 }
             }
             return false;
@@ -196,24 +221,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 case LED_FLAG_ALL: {
                     rgb_matrix_set_flags(LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR);
                     rgb_matrix_set_color_all(0, 0, 0);
+                    alt_config.rgb_mode = RGB_MODE_KEYLIGHT;
                   }
                   break;
                 case (LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR): {
                     rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
                     rgb_matrix_set_color_all(0, 0, 0);
+                    alt_config.rgb_mode = RGB_MODE_UNDERGLOW;
                   }
                   break;
                 case LED_FLAG_UNDERGLOW: {
                     rgb_matrix_set_flags(LED_FLAG_NONE);
                     rgb_matrix_disable_noeeprom();
+                    alt_config.rgb_mode = RGB_MODE_NONE;
                   }
                   break;
                 default: {
                     rgb_matrix_set_flags(LED_FLAG_ALL);
                     rgb_matrix_enable_noeeprom();
+                    alt_config.rgb_mode = RGB_MODE_ALL;
                   }
                   break;
               }
+              eeconfig_update_user(alt_config.raw);
             }
             return false;
         case RGB_FRZ:
@@ -232,6 +262,28 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         default:
             return true; //Process all other keycodes normally
+    }
+}
+
+void keyboard_post_init_kb(void) {
+    alt_config.raw = eeconfig_read_user();
+    switch (alt_config.rgb_mode) {
+        case RGB_MODE_ALL:
+            rgb_matrix_set_flags(LED_FLAG_ALL);
+            rgb_matrix_enable_noeeprom();
+            break;
+        case RGB_MODE_KEYLIGHT:
+            rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
+            rgb_matrix_set_color_all(0, 0, 0);
+            break;
+        case RGB_MODE_UNDERGLOW:
+            rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
+            rgb_matrix_set_color_all(0, 0, 0);
+            break;
+        case RGB_MODE_NONE:
+            rgb_matrix_set_flags(LED_FLAG_NONE);
+            rgb_matrix_disable_noeeprom();
+            break;
     }
 }
 
