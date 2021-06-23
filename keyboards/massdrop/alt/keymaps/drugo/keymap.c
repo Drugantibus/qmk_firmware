@@ -2,27 +2,29 @@
 #include "raw_hid.h"
 
 enum alt_keycodes {
-    U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
-    U_T_AGCR,              //USB Toggle Automatic GCR control
-    DBG_TOG,               //DEBUG Toggle On / Off
-    DBG_MTRX,              //DEBUG Toggle Matrix Prints
-    DBG_KBD,               //DEBUG Toggle Keyboard Prints
-    DBG_MOU,               //DEBUG Toggle Mouse Prints
-    MD_BOOT,               //Restart into bootloader after hold timeout
-    RGB_FRZ,               //Freezes current RGB effect
-//    HID_SND,               //Send test HID
-    MCR_BST,               //Signature macro (Best)
-    MCR_THX,               //Signature macro (Thanks)
-    MCR_APPR,              //Approval macro
-    MCR_PSW,               //Password macro
-    MCR_ISS,               //Issues macro
-    MCR_TVW,               //Teamviewer macro
-    MCR_UCIS,              //Print configured UCIS entries
-    UNI_ON,                //Startd UCIS (unicode input)
+    U_T_AUTO = SAFE_RANGE,  //USB Extra Port Toggle Auto Detect / Always Active
+    U_T_AGCR,               //USB Toggle Automatic GCR control
+    DBG_TOG,                //DEBUG Toggle On / Off
+    DBG_MTRX,               //DEBUG Toggle Matrix Prints
+    DBG_KBD,                //DEBUG Toggle Keyboard Prints
+    DBG_MOU,                //DEBUG Toggle Mouse Prints
+    MD_BOOT,                //Restart into bootloader after hold timeout
+    RGB_FRZ,                //Freezes current RGB effect
+//    HID_SND,                //Send test HID
+    CST_MAC,                //CTRL/CMD CAPS mod-tap
+    MAC_SW,                 //Switch mac mode on/off
+    MCR_BST,                //Signature macro (Best)
+    MCR_THX,                //Signature macro (Thanks)
+    MCR_APPR,               //Approval macro
+    MCR_PSW,                //Password macro
+    MCR_ISS,                //Issues macro
+    MCR_TVW,                //Teamviewer macro
+    MCR_UCIS,               //Print configured UCIS entries
+    UNI_ON,                 //Startd UCIS (unicode input)
 };
 
 enum {
-    TD_LOCK,           //ESC/GUI+L
+    TD_LOCK,                //ESC/GUI+L
 };
 
 enum alt_rgb_mode {
@@ -41,12 +43,14 @@ typedef union {
 
 alt_config_t alt_config;
 
+bool mac_on = false;
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // DEFAULT
     [0] = LAYOUT_65_ansi_blocker(
     TD(TD_LOCK), KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
         KC_TAB , KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_END,  \
- CTL_T(KC_CAPS), KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
+        CST_MAC, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
         KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                             KC_RALT, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
@@ -60,19 +64,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     // MACRO
     [2] = LAYOUT_65_ansi_blocker(
-        TG(3)  , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        MAC_SW , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, MCR_THX, _______,MCR_UCIS, MCR_ISS, _______, MCR_PSW, _______, _______, _______, _______, \
         _______,MCR_APPR, _______, _______, _______, _______, MCR_TVW, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, MCR_BST, _______, _______, _______, _______, _______, _______,          _______, _______, \
         DM_REC1, DM_RSTP, DM_PLY1,                            _______,                            _______, _______, _______, _______, _______  \
-    ),
-    // MACOS
-    [3] = LAYOUT_65_ansi_blocker(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
- CMD_T(KC_CAPS), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
     )
 };
 
@@ -82,6 +78,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 #define MODS_ALT  (get_mods() & MOD_BIT(KC_LALT) || get_mods() & MOD_BIT(KC_RALT))
 
 uint8_t layer_previous_state = LED_FLAG_ALL;
+uint16_t cst_mac = CTL_T(KC_CAPS);
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
@@ -126,6 +123,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+        case MAC_SW:
+            if (record->event.pressed) {
+                mac_on = !mac_on;
+                if (cst_mac == CTL_T(KC_CAPS)){
+                    cst_mac = GUI_T(KC_CAPS);
+                }
+                else{
+                    cst_mac = CTL_T(KC_CAPS);
+                }
+            }
+            return false;
+        case CST_MAC:
+            if (record->event.pressed) {
+                register_code(cst_mac);
+            }
+            else{
+                unregister_code(cst_mac);
+            }
         case EEP_RST:
             if (record->event.pressed) {
                 key_timer = timer_read32();
